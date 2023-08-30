@@ -45,8 +45,6 @@
             sail.rotation.z = Math.PI / 4;
             sail.setParent(parentMesh);
 
-            var mesh = BABYLON.Mesh.MergeMeshes([boatBase, mast, sail], true, true, undefined, false, true);
-
 
             // Ground setup
             var ground = BABYLON.Mesh.CreateGround("ground", 100, 100, 1, scene, false);
@@ -64,12 +62,13 @@
             var waterMaterial = new BABYLON.WaterMaterial("water", scene);
             waterMaterial.bumpTexture = new BABYLON.Texture("./water.png", scene);
             waterMaterial.windForce = -1;
-            waterMaterial.waveHeight = 0.2;
-            waterMaterial.bumpHeight = 0.1;
-            waterMaterial.windDirection = new BABYLON.Vector2(1, 1);
+            waterMaterial.waveHeight = 0.3;
+            waterMaterial.bumpHeight = 0.2;
+            waterMaterial.windDirection = new BABYLON.Vector2(0, 1);
+            waterMaterial.waveSpeed = 100.0;
             waterMaterial.waterColor = new BABYLON.Color3(0, 0, 221 / 255);
             waterMaterial.colorBlendFactor = 0.3;
-            waterMaterial.waveSpeed = 100.0;
+
             waterMaterial.addToRenderList(ground);
             // waterMaterial.bumpTexture.uScale = 10;
             // waterMaterial.bumpTexture.vScale = 10;
@@ -90,9 +89,19 @@
 
         var scene = createScene();
 
-        engine.runRenderLoop(function () {
-            var boat = scene.getMeshByName("your-boat-name"); // Replace with the actual name used in the model
+        var waveAmplitude = 0.3;
+        var waveLength = 0.3;
+        var waveSpeed = 100.0;
+        var time = 0;
 
+
+        engine.runRenderLoop(function () {
+            var boat = scene.getMeshByName("parent"); // Replace with the actual name used in the model
+            if (boat) {
+                boat.position.y = 1 + waveAmplitude * Math.sin(time + boat.position.x / waveLength);
+                boat.rotation.y = 0.03 * Math.sin(time + boat.position.z / waveLength);
+                time += waveSpeed * engine.getDeltaTime() / 100000;
+            }
 
             scene.render();
         });
